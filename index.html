@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>고급 프로젝트 관리 템플릿</title>
+    <title>Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
@@ -14,27 +14,22 @@
                         sans: ['Noto Sans KR', 'sans-serif'],
                     },
                     colors: {
-                        'project-not-started': '#d1d5db', // 작업전 (Gray)
-                        'project-in-progress': '#3b82f6', // 작업중 (Blue)
-                        'project-revising': '#f59e0b',   // 수정중 (Amber)
-                        'project-on-hold': '#6b7280',     // 보류 (Gray)
-                        'project-completed': '#10b981',   // 완료 (Emerald)
+                        'project-not-started': '#d1d5db',
+                        'project-in-progress': '#3b82f6',
+                        'project-revising': '#f59e0b',
+                        'project-on-hold': '#6b7280',
+                        'project-completed': '#10b981',
                     }
                 },
             },
         };
     </script>
-    <!-- Firebase SDKs -->
-    <script type_module src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
-    <script type_module src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
-    <script type_module src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
 
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #f3f4f6;
         }
-        /* 로딩 스피너 */
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #4f46e5;
@@ -52,7 +47,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        /* 커스텀 체크박스 */
         .task-checkbox {
             appearance: none;
             width: 20px;
@@ -69,7 +63,7 @@
             border-color: #4f46e5;
         }
         .task-checkbox:checked::after {
-            content: '\u2713'; /* 체크마크 */
+            content: '\u2713';
             color: white;
             font-size: 14px;
             font-weight: bold;
@@ -82,9 +76,8 @@
             text-decoration: line-through;
             color: #94a3b8;
         }
-        /* 모달 */
         .modal {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -92,11 +85,11 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+            background-color: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
         }
-        .modal.flex { display: flex; } /* To show */
+        .modal.flex { display: flex; }
         .modal-content {
             background-color: #fefefe;
             margin: auto;
@@ -107,7 +100,6 @@
             max-width: 500px;
             box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        /* 프로그레스 바 */
         .progress-bar {
             background-color: #e5e7eb;
             border-radius: 999px;
@@ -119,7 +111,6 @@
             height: 100%;
             transition: width 0.3s ease;
         }
-        /* 탭 스타일 */
         .tab-btn {
             padding: 8px 16px;
             border-radius: 8px;
@@ -134,7 +125,6 @@
         .tab-btn:not(.active):hover {
             background-color: #f0f0f5;
         }
-        /* 상태 셀렉트 박스 */
         .status-select {
             padding: 4px 8px;
             border-radius: 6px;
@@ -155,10 +145,7 @@
 
     <div id="loader" class="loader"></div>
 
-    <!-- 전체 컨테이너 -->
     <div class="max-w-7xl mx-auto p-4 sm:p-8">
-
-        <!-- 헤더 및 탭 네비게이션 -->
         <header class="mb-6 flex flex-col sm:flex-row justify-between items-center">
             <h1 class="text-3xl font-bold text-gray-900">🚀 고급 프로젝트 관리 템플릿</h1>
             <div class="mt-4 sm:mt-0 p-1 bg-gray-200 rounded-lg flex gap-2">
@@ -167,9 +154,8 @@
             </div>
         </header>
 
-        <!-- ======================= 1. 대시보드 뷰 ======================= -->
+        <!-- Dashboard -->
         <div id="view-dashboard" class="space-y-6">
-            <!-- 오늘 날짜 및 통계 -->
             <div class="p-6 bg-white rounded-2xl shadow-lg">
                 <h2 class="text-2xl font-bold text-gray-800">오늘의 요약</h2>
                 <p id="dashboard-date" class="text-lg text-indigo-600 font-semibold"></p>
@@ -190,33 +176,25 @@
                 </div>
             </div>
 
-            <!-- 누락 방지 (오늘 할 일 & 마감 임박) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- 오늘 해야 할 작업 -->
                 <div class="p-6 bg-white rounded-2xl shadow-lg">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">⏰ 오늘까지!</h3>
-                    <div id="dashboard-today-tasks" class="space-y-2">
-                        <!-- 태스크가 여기에 동적으로 추가됩니다 -->
-                    </div>
+                    <div id="dashboard-today-tasks" class="space-y-2"></div>
                 </div>
-                <!-- 마감 임박 작업 -->
                 <div class="p-6 bg-white rounded-2xl shadow-lg">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">🔥 마감 임박 (3일 이내)</h3>
-                    <div id="dashboard-due-soon-tasks" class="space-y-2">
-                        <!-- 태스크가 여기에 동적으로 추가됩니다 -->
-                    </div>
+                    <div id="dashboard-due-soon-tasks" class="space-y-2"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ======================= 2. 프로젝트 뷰 ======================= -->
+        <!-- Projects -->
         <div id="view-projects" class="hidden space-y-4">
             <div class="flex justify-end">
                 <button id="open-project-modal-btn" class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition duration-200">
                     + 새 프로젝트 추가
                 </button>
             </div>
-            <!-- 프로젝트 리스트 (테이블) -->
             <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -230,16 +208,13 @@
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">삭제</th>
                         </tr>
                     </thead>
-                    <tbody id="project-list-body" class="bg-white divide-y divide-gray-200">
-                        <!-- 프로젝트 행이 여기에 동적으로 추가됩니다 -->
-                    </tbody>
+                    <tbody id="project-list-body" class="bg-white divide-y divide-gray-200"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ======================= 3. 태스크 뷰 ======================= -->
+        <!-- Tasks -->
         <div id="view-tasks" class="hidden space-y-4">
-            <!-- 태스크 헤더 -->
             <div class="flex justify-between items-center">
                 <button id="back-to-projects-btn" class="text-indigo-600 font-semibold hover:underline">&larr; 프로젝트 목록으로</button>
                 <button id="open-task-modal-btn" class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition duration-200">
@@ -253,18 +228,11 @@
                 </div>
                 <p id="task-view-progress-text" class="text-sm text-gray-600 mt-1 text-right font-medium">0% (0/0)</p>
             </div>
-            
-            <!-- 태스크 리스트 -->
-            <div id="task-list-container" class="space-y-3">
-                <!-- 태스크가 여기에 동적으로 추가됩니다 -->
-            </div>
+            <div id="task-list-container" class="space-y-3"></div>
         </div>
+    </div>
 
-    </div> <!-- End Main Container -->
-
-    <!-- ======================= 모달 섹션 ======================= -->
-
-    <!-- 1. 새 프로젝트 모달 -->
+    <!-- Project Modal -->
     <div id="project-modal" class="modal">
         <div class="modal-content space-y-4">
             <h3 class="text-xl font-bold">새 프로젝트</h3>
@@ -309,7 +277,7 @@
         </div>
     </div>
 
-    <!-- 2. 새 태스크 모달 -->
+    <!-- Task Modal -->
     <div id="task-modal" class="modal">
         <div class="modal-content space-y-4">
             <h3 class="text-xl font-bold">새 태스크</h3>
@@ -345,11 +313,9 @@
         </div>
     </div>
 
-    <!-- 메시지 박스 -->
     <div id="message-box" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #22c55e; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 500; opacity: 0; transition: all 0.5s; visibility: hidden; z-index: 1000;"></div>
 
     <script type="module">
-        // Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
@@ -357,7 +323,6 @@
             doc, 
             collection, 
             addDoc, 
-            setDoc,
             updateDoc,
             deleteDoc, 
             onSnapshot, 
@@ -365,11 +330,18 @@
             setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase 초기화 및 인증 ---
-        
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Firebase 설정 (본인 값으로 교체)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+        };
+
+        const appId = "project-manager";
+        const initialAuthToken = null;
 
         let app, auth, db, userId;
         let projectsCollectionRef = null;
@@ -377,13 +349,13 @@
         let unsubscribeProjects = null;
         let unsubscribeTasks = null;
 
-        setLogLevel('Debug');
+        setLogLevel('debug');
 
-        // --- 글로벌 상태 ---
         let projectsCache = [];
         let tasksCache = [];
-        let currentView = 'dashboard'; // 'dashboard', 'projects', 'tasks'
+        let currentView = 'dashboard';
         let currentProjectId = null;
+
         const statusColors = {
             '작업전': 'bg-project-not-started',
             '작업중': 'bg-project-in-progress',
@@ -397,7 +369,6 @@
             '높음': 'bg-red-100 text-red-800',
         };
 
-        // --- UI 요소 ---
         const loader = document.getElementById('loader');
         const messageBox = document.getElementById('message-box');
 
@@ -408,7 +379,6 @@
         const viewProjects = document.getElementById('view-projects');
         const viewTasks = document.getElementById('view-tasks');
 
-        // 대시보드
         const dashboardDate = document.getElementById('dashboard-date');
         const statTotalProjects = document.getElementById('stat-total-projects');
         const statInProgress = document.getElementById('stat-in-progress');
@@ -416,14 +386,12 @@
         const dashboardTodayTasks = document.getElementById('dashboard-today-tasks');
         const dashboardDueSoonTasks = document.getElementById('dashboard-due-soon-tasks');
 
-        // 프로젝트
         const openProjectModalBtn = document.getElementById('open-project-modal-btn');
         const projectModal = document.getElementById('project-modal');
         const projectForm = document.getElementById('project-form');
         const closeProjectModalBtn = document.getElementById('close-project-modal-btn');
         const projectListBody = document.getElementById('project-list-body');
 
-        // 태스크
         const backToProjectsBtn = document.getElementById('back-to-projects-btn');
         const openTaskModalBtn = document.getElementById('open-task-modal-btn');
         const taskModal = document.getElementById('task-modal');
@@ -431,12 +399,9 @@
         const closeTaskModalBtn = document.getElementById('close-task-modal-btn');
         const taskProjectIdInput = document.getElementById('task-project-id');
         const taskViewProjectName = document.getElementById('task-view-project-name');
-        const taskViewProgressBar = document.getElementById('task-view-progress-bar');
         const taskViewProgressInner = document.getElementById('task-view-progress-inner');
         const taskViewProgressText = document.getElementById('task-view-progress-text');
         const taskListContainer = document.getElementById('task-list-container');
-        
-        // --- 헬퍼 함수 ---
         
         function showMessage(message, isSuccess = true) {
             messageBox.textContent = message;
@@ -446,7 +411,7 @@
             setTimeout(() => {
                 messageBox.style.opacity = '0';
                 messageBox.style.visibility = 'hidden';
-            }, 3000);
+            }, 2000);
         }
 
         function getTodayString() {
@@ -460,16 +425,24 @@
             return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
         }
 
-        // --- 뷰 전환 로직 ---
+        function persistViewState() {
+            localStorage.setItem('pm_currentView', currentView);
+            localStorage.setItem('pm_currentProjectId', currentProjectId || '');
+        }
+
+        function restoreViewState() {
+            const savedView = localStorage.getItem('pm_currentView');
+            const savedProjectId = localStorage.getItem('pm_currentProjectId');
+            if (savedView) currentView = savedView;
+            if (savedProjectId) currentProjectId = savedProjectId;
+        }
+
         function switchView(view) {
             currentView = view;
-            
-            // 모든 뷰 숨기기
             viewDashboard.classList.add('hidden');
             viewProjects.classList.add('hidden');
             viewTasks.classList.add('hidden');
             
-            // 탭 비활성화
             tabDashboard.classList.remove('active');
             tabProjects.classList.remove('active');
 
@@ -483,23 +456,19 @@
                 renderProjects();
             } else if (view === 'tasks') {
                 viewTasks.classList.remove('hidden');
-                // 태스크 뷰는 탭이 아님 (하위 뷰)
-                tabProjects.classList.add('active'); // 부모인 프로젝트 탭을 활성화
+                tabProjects.classList.add('active');
                 renderTasksView();
             }
+
+            persistViewState();
         }
 
-        // --- 렌더링 함수 ---
-
-        // 1. 대시보드 렌더링
         function renderDashboard() {
-            // 오늘 날짜
             const today = new Date();
             dashboardDate.textContent = today.toLocaleDateString('ko-KR', {
                 year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
             });
 
-            // 통계
             const total = projectsCache.length;
             const inProgress = projectsCache.filter(p => p.status === '작업중' || p.status === '수정중').length;
             const completed = projectsCache.filter(p => p.status === '완료').length;
@@ -507,21 +476,20 @@
             statInProgress.textContent = inProgress;
             statCompleted.textContent = completed;
 
-            // 태스크 필터링
             const todayStr = getTodayString();
             const threeDaysLater = new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-            const todayTasks = tasksCache.filter(t => t.dueDate === todayStr && !t.completed);
-            const dueSoonTasks = tasksCache.filter(t => 
-                t.dueDate > todayStr && 
-                t.dueDate <= threeDaysLater && 
-                !t.completed
-            );
+            const todayTasks = tasksCache
+                .filter(t => t.dueDate === todayStr && !t.completed)
+                .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
 
-            // 오늘 할 일 렌더링
+            const dueSoonTasks = tasksCache
+                .filter(t => t.dueDate > todayStr && t.dueDate <= threeDaysLater && !t.completed)
+                .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+
             dashboardTodayTasks.innerHTML = '';
             if (todayTasks.length === 0) {
-                dashboardTodayTasks.innerHTML = '<p class="text-gray-500">오늘 마감인 작업이 없습니다. 훌륭해요!</p>';
+                dashboardTodayTasks.innerHTML = '<p class="text-gray-500">오늘 마감인 작업이 없습니다.</p>';
             } else {
                 todayTasks.forEach(task => {
                     const project = projectsCache.find(p => p.id === task.projectId);
@@ -529,7 +497,6 @@
                 });
             }
 
-            // 마감 임박 렌더링
             dashboardDueSoonTasks.innerHTML = '';
             if (dueSoonTasks.length === 0) {
                 dashboardDueSoonTasks.innerHTML = '<p class="text-gray-500">마감 임박 작업이 없습니다.</p>';
@@ -554,15 +521,12 @@
             return el;
         }
 
-        // 2. 프로젝트 리스트 렌더링
         function renderProjects() {
-            projectListBody.innerHTML = ''; // 목록 비우기
+            projectListBody.innerHTML = '';
             
             const sortedProjects = [...projectsCache].sort((a, b) => {
-                // 완료된 프로젝트를 맨 뒤로
                 if (a.status === '완료' && b.status !== '완료') return 1;
                 if (a.status !== '완료' && b.status === '완료') return -1;
-                // 마감일 순 정렬
                 if (a.endDate && b.endDate) return new Date(a.endDate) - new Date(b.endDate);
                 if (a.endDate) return -1;
                 if (b.endDate) return 1;
@@ -575,7 +539,6 @@
             }
 
             sortedProjects.forEach(project => {
-                // 진행률 계산
                 const projectTasks = tasksCache.filter(t => t.projectId === project.id);
                 const completedTasks = projectTasks.filter(t => t.completed).length;
                 const totalTasks = projectTasks.length;
@@ -592,7 +555,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${project.client || '-'}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <select class="status-select text-sm ${statusColor} text-white" data-projectid="${project.id}">
+                        <select class="status-select text-sm text-white ${statusColor}" data-projectid="${project.id}">
                             ${Object.keys(statusColors).map(status => `
                                 <option value="${status}" ${project.status === status ? 'selected' : ''}>${status}</option>
                             `).join('')}
@@ -617,11 +580,11 @@
                 projectListBody.appendChild(tr);
             });
 
-            // 이벤트 리스너 바인딩
             projectListBody.querySelectorAll('.project-link').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     currentProjectId = e.target.dataset.projectid;
+                    persistViewState();
                     switchView('tasks');
                 });
             });
@@ -634,14 +597,11 @@
 
             projectListBody.querySelectorAll('.delete-project-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    // confirm()은 캔버스 환경에서 작동하지 않을 수 있으므로, 간단히 삭제 처리합니다.
-                    // 실제 앱에서는 커스텀 확인 모달을 띄워야 합니다.
                     deleteProject(e.target.dataset.projectid);
                 });
             });
         }
-        
-        // 3. 태스크 뷰 렌더링
+
         function renderTasksView() {
             if (!currentProjectId) {
                 switchView('projects');
@@ -660,26 +620,21 @@
             const projectTasks = tasksCache
                 .filter(t => t.projectId === currentProjectId)
                 .sort((a, b) => {
-                    // 1. 완료 여부
                     if (a.completed !== b.completed) return a.completed ? 1 : -1;
-                    // 2. 마감일
                     if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
                     if (a.dueDate) return -1;
                     if (b.dueDate) return 1;
-                    // 3. 우선순위 (높음 > 보통 > 낮음)
                     const prio = { '높음': 1, '보통': 2, '낮음': 3 };
                     if (prio[a.priority] !== prio[b.priority]) return prio[a.priority] - prio[b.priority];
                     return 0;
                 });
 
-            // 진행률 업데이트
             const completedTasks = projectTasks.filter(t => t.completed).length;
             const totalTasks = projectTasks.length;
             const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
             taskViewProgressInner.style.width = `${progress}%`;
             taskViewProgressText.textContent = `${progress}% (${completedTasks}/${totalTasks})`;
 
-            // 태스크 목록 렌더링
             taskListContainer.innerHTML = '';
             if (projectTasks.length === 0) {
                 taskListContainer.innerHTML = '<p class="text-center text-gray-500 py-10">태스크가 없습니다. 새 태스크를 추가해보세요.</p>';
@@ -708,18 +663,18 @@
                 </div>
                 <div class="flex-shrink-0 flex flex-col items-end gap-1 text-sm">
                     <span class="px-2 py-0.5 rounded-full font-semibold text-xs ${prioColor}">${task.priority}</span>
-                    <span class_="${isOverdue ? 'text-red-600 font-bold' : 'text-gray-600'}">${dueDateStr}</span>
+                    <span class="${isOverdue ? 'text-red-600 font-bold' : 'text-gray-600'}">${dueDateStr}</span>
                     <button class="delete-task-btn text-gray-400 hover:text-red-500 text-xl font-bold">&times;</button>
                 </div>
             `;
 
-            // 이벤트 리스너
             el.querySelector('.task-checkbox').addEventListener('change', (e) => {
                 updateTask(task.id, { completed: e.target.checked });
             });
             el.querySelector('.task-name-input').addEventListener('blur', (e) => {
-                if (e.target.value.trim() !== task.name) {
-                    updateTask(task.id, { name: e.target.value.trim() });
+                const newName = e.target.value.trim();
+                if (newName && newName !== task.name) {
+                    updateTask(task.id, { name: newName });
                 }
             });
             el.querySelector('.delete-task-btn').addEventListener('click', () => {
@@ -729,13 +684,10 @@
             return el;
         }
 
-        // --- Firebase 데이터 로드 (실시간) ---
-        
         function initApp(uid) {
             userId = uid;
             projectsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/projects`);
             tasksCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/tasks`);
-            
             loadProjects();
             loadTasks();
         }
@@ -746,10 +698,9 @@
 
             unsubscribeProjects = onSnapshot(query(projectsCollectionRef), (snapshot) => {
                 projectsCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("Projects loaded:", projectsCache.length);
                 if (currentView === 'dashboard') renderDashboard();
                 if (currentView === 'projects') renderProjects();
-                if (currentView === 'tasks') renderTasksView(); // For progress update
+                if (currentView === 'tasks') renderTasksView();
                 loader.style.display = 'none';
             }, (error) => {
                 console.error("프로젝트 로드 오류:", error);
@@ -763,19 +714,15 @@
             
             unsubscribeTasks = onSnapshot(query(tasksCollectionRef), (snapshot) => {
                 tasksCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("Tasks loaded:", tasksCache.length);
                 if (currentView === 'dashboard') renderDashboard();
-                if (currentView === 'projects') renderProjects(); // For progress update
+                if (currentView === 'projects') renderProjects();
                 if (currentView === 'tasks') renderTasksView();
             }, (error) => {
                 console.error("태스크 로드 오류:", error);
                 showMessage("태스크 로드에 실패했습니다.", false);
             });
         }
-        
-        // --- Firebase CRUD 작업 ---
 
-        // 프로젝트
         async function handleProjectFormSubmit(e) {
             e.preventDefault();
             const project = {
@@ -804,7 +751,6 @@
             try {
                 await updateDoc(projectRef, { status: status });
                 showMessage("상태가 업데이트되었습니다.");
-                // onSnapshot이 UI를 갱신
             } catch (error) {
                 console.error("상태 업데이트 오류:", error);
                 showMessage("상태 업데이트에 실패했습니다.", false);
@@ -812,20 +758,16 @@
         }
 
         async function deleteProject(id) {
-            // TODO: 관련 태스크도 함께 삭제하는 로직이 필요할 수 있습니다.
-            // 여기서는 일단 프로젝트만 삭제합니다.
             const projectRef = doc(db, projectsCollectionRef.path, id);
             try {
                 await deleteDoc(projectRef);
                 showMessage("프로젝트가 삭제되었습니다.");
-                // onSnapshot이 UI를 갱신
             } catch (error) {
                 console.error("프로젝트 삭제 오류:", error);
                 showMessage("프로젝트 삭제에 실패했습니다.", false);
             }
         }
 
-        // 태스크
         async function handleTaskFormSubmit(e) {
             e.preventDefault();
             const task = {
@@ -853,7 +795,6 @@
             const taskRef = doc(db, tasksCollectionRef.path, id);
             try {
                 await updateDoc(taskRef, data);
-                showMessage("태스크가 업데이트되었습니다.");
             } catch (error) {
                 console.error("태스크 업데이트 오류:", error);
                 showMessage("태스크 업데이트에 실패했습니다.", false);
@@ -870,8 +811,7 @@
                 showMessage("태스크 삭제에 실패했습니다.", false);
             }
         }
-        
-        // --- 인증 및 앱 시작 ---
+
         async function initializeFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
@@ -880,10 +820,8 @@
 
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
-                        console.log("인증 성공! User ID:", user.uid);
                         initApp(user.uid);
                     } else {
-                        console.log("인증된 사용자 없음. 익명 로그인 시도...");
                         if (initialAuthToken) {
                             await signInWithCustomToken(auth, initialAuthToken);
                         } else {
@@ -899,18 +837,13 @@
             }
         }
 
-        // --- 초기 이벤트 리스너 설정 ---
-        
-        // 탭
         tabDashboard.addEventListener('click', () => switchView('dashboard'));
         tabProjects.addEventListener('click', () => switchView('projects'));
         
-        // 프로젝트 모달
         openProjectModalBtn.addEventListener('click', () => projectModal.classList.add('flex'));
         closeProjectModalBtn.addEventListener('click', () => projectModal.classList.remove('flex'));
         projectForm.addEventListener('submit', handleProjectFormSubmit);
         
-        // 태스크 모달
         openTaskModalBtn.addEventListener('click', () => {
             taskProjectIdInput.value = currentProjectId;
             taskModal.classList.add('flex');
@@ -918,13 +851,11 @@
         closeTaskModalBtn.addEventListener('click', () => taskModal.classList.remove('flex'));
         taskForm.addEventListener('submit', handleTaskFormSubmit);
 
-        // 태스크 뷰 -> 프로젝트 뷰
         backToProjectsBtn.addEventListener('click', () => switchView('projects'));
         
-        // --- 앱 시작 ---
+        restoreViewState();
         initializeFirebase();
-        switchView('dashboard'); // 초기 뷰 설정
-
+        switchView(currentView || 'dashboard');
     </script>
 </body>
 </html>
